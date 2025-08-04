@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.foundation)
 
     // Retrofit para chamadas de API
     implementation(libs.retrofit)

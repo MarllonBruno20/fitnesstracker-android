@@ -21,11 +21,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import br.com.marllonbruno.fitnesstracker.android.R
 import br.com.marllonbruno.fitnesstracker.android.ui.theme.FitnessTrackerTheme
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.LoginUiState
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.LoginViewModel
@@ -78,13 +80,13 @@ fun LoginScreenContent(
         OutlinedTextField(
             value = uiState.email,
             onValueChange = onEmailChanged,
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.login_email)) },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = uiState.password,
             onValueChange = onPasswordChanged,
-            label = { Text("Senha") },
+            label = { Text(stringResource(R.string.login_password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -93,13 +95,13 @@ fun LoginScreenContent(
             enabled = !uiState.isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (uiState.isLoading) "Entrando..." else "Entrar")
+            Text(if (uiState.isLoading) stringResource(R.string.login_button_loading) else stringResource(R.string.login_button_done))
         }
         if (uiState.errorMessage != null) {
             Text(text = uiState.errorMessage, color = MaterialTheme.colorScheme.error)
         }
         TextButton(onClick = onNavigateToRegister) {
-            Text("Não tem uma conta? Cadastre-se")
+            Text(stringResource(R.string.login_register))
         }
     }
 }

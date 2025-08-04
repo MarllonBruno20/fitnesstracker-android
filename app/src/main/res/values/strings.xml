@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">FitnessTracker</string>
+
+    <string name="back">Voltar</string>
+    <string name="next">Próximo</string>
+    <string name="skip">Pular</string>
+    <string name="close">Fechar</string>
+    <string name="get_started">Começar</string>
+
+    <string name="onboarding_welcome_title">Bem-vindo ao FitnessTracker</string>
+    <string name="onboarding_welcome_subtitle">Seu assistente pessoal para uma vida mais saudável.</string>
+    <string name="onboarding_recipes_title">Receitas Deliciosas</string>
+    <string name="onboarding_recipes_subtitle">Encontre e salve receitas que se encaixam nos seus objetivos.</string>
+    <string name="onboarding_progress_title">Acompanhe seu Progresso</string>
+    <string name="onboarding_progress_subtitle">Registre suas refeições e monitore suas metas nutricionais.</string>
+    <string name="onboarding_welcome_button">Começar Agora</string>
+    
+    <string name="register_title">Criar Conta</string>
+    <string name="register_name">Nome</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Senha</string>
+    <string name="register_button_loading">Carregando…</string>
+    <string name="register_button_done">Criar Conta</string>
+    <string name="register_login">Já possui uma conta? Faça login</string>
+    <string name="register_error_message">Falha ao registrar. Tente novamente.</string>
+
+    <string name="login_title">Entrar</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Senha</string>
+    <string name="login_button_loading">Carregando…</string>
+    <string name="login_button_done">Entrar</string>
+    <string name="login_register">Não possui uma conta? Crie uma</string>
 </resources>
