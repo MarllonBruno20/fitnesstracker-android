@@ -73,7 +73,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
 
+    // TESTES
     testImplementation(libs.junit)
+    // MockK - A biblioteca de mocking idiomática para Kotlin (substitui o Mockito)
+    testImplementation(libs.mockk)
+    // Turbine - Para testar StateFlow de forma fácil e robusta
+    testImplementation(libs.turbine)
+    // Testes de Coroutines
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

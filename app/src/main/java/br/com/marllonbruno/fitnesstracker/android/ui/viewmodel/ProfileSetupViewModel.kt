@@ -39,45 +39,40 @@ class ProfileSetupViewModel(private val profileRepository: ProfileRepository) : 
         }
     }
 
-    private fun validadeInputs() : Boolean {
+    private fun validateInputs(): Map<String, String> {
         val currentState = _uiState.value
+        val errors = mutableMapOf<String, String>()
 
-        // Limpa os erros anteriores
-        _uiState.update { it.copy(
-            birthDateError = null,
-            heightCmError = null,
-            currentWeightKgError = null,
-            genderError = null,
-            activityLevelError = null,
-            objectiveError = null
-        ) }
+        if (currentState.heightCm.isBlank()) errors["height"] = "Altura é obrigatória"
+        if (currentState.currentWeightKg.isBlank()) errors["weight"] = "Peso é obrigatório"
+        if (currentState.birthDate == null) errors["birthDate"] = "Data de Nascimento é obrigatória"
+        if (currentState.gender == null) errors["gender"] = "Gênero é obrigatório"
+        if (currentState.activityLevel == null) errors["activityLevel"] = "Nível de Atividade é obrigatório"
+        if (currentState.objective == null) errors["objective"] = "Objetivo é obrigatório"
 
-        val birthError = if (currentState.heightCm.isBlank()) "Por favor, preencha a altura" else null
-        val heightError = if (currentState.heightCm.isBlank()) "Por favor, preencha a altura" else null
-        val weightError = if (currentState.currentWeightKg.isBlank()) "Por favor, preencha o peso atual" else null
-        val genderError = if (currentState.gender == null) "Por favor, selecione o sexo" else null
-        val activityLevelError = if (currentState.activityLevel == null) "Por favor, selecione o nivel de atividade" else null
-        val objectiveError = if (currentState.objective == null) "Por favor, selecione o objetivo" else null
-
-        _uiState.update { it.copy(
-            birthDateError = birthError,
-            heightCmError = heightError,
-            currentWeightKgError = weightError,
-            genderError = genderError,
-            activityLevelError = activityLevelError,
-            objectiveError = objectiveError
-        ) }
-
-        return birthError == null &&
-                heightError == null &&
-                weightError == null &&
-                genderError == null &&
-                activityLevelError == null &&
-                objectiveError == null
+        return errors
     }
 
     private fun saveProfileData() {
-        if(validadeInputs()) {
+
+        val validationErrors = validateInputs()
+
+        // 2. Verificamos se há erros.
+        if (validationErrors.isNotEmpty()) {
+            // Se houver erros, fazemos UMA ÚNICA atualização de estado com todos eles.
+            _uiState.update {
+                it.copy(
+                    heightCmError = validationErrors["height"],
+                    currentWeightKgError = validationErrors["weight"],
+                    birthDateError = validationErrors["birthDate"],
+                    genderError = validationErrors["gender"],
+                    activityLevelError = validationErrors["activityLevel"],
+                    objectiveError = validationErrors["objective"]
+                )
+            }
+            return // Para a execução aqui.
+        }
+
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
@@ -112,7 +107,6 @@ class ProfileSetupViewModel(private val profileRepository: ProfileRepository) : 
                     )
                 }
             }
-        }
     }
 
     companion object {
