@@ -53,7 +53,7 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
     companion object {
         fun Factory(application: Application): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val apiService = RetrofitClient.instance
+                val apiService = RetrofitClient.create(context = application)
                 val prefsRepository = UserPreferencesRepository(application)
                 val authRepository = AuthRepository(apiService, prefsRepository)
                 LoginViewModel(authRepository)

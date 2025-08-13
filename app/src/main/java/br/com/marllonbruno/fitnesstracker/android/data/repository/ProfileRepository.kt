@@ -17,8 +17,7 @@ class ProfileRepository(
         if(token.isNullOrBlank()) return null
 
         try {
-            val response = apiService.updateProfile("Bearer $token", request)
-
+            val response = apiService.updateProfile(request)
             return if (response.isSuccessful) response.body() else null
         } catch (e: Exception) {
             e.printStackTrace()
@@ -33,7 +32,7 @@ class ProfileRepository(
         if(token.isNullOrBlank()) return null
 
         try {
-            val response = apiService.getProfile("Bearer $token")
+            val response = apiService.getProfile()
 
             return if (response.isSuccessful) response.body() else null
         } catch (e: Exception) {

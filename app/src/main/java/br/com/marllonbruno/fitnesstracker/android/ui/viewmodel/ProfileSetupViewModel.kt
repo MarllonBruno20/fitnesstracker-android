@@ -118,7 +118,7 @@ class ProfileSetupViewModel(private val profileRepository: ProfileRepository) : 
     companion object {
         fun Factory(application: Application): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val apiService = RetrofitClient.instance
+                val apiService = RetrofitClient.create(context = application)
                 val prefsRepository = UserPreferencesRepository(application)
                 val profileRepository = ProfileRepository(apiService, prefsRepository)
                 ProfileSetupViewModel(profileRepository)

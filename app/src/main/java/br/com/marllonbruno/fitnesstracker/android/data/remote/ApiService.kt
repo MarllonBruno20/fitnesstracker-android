@@ -15,11 +15,10 @@ interface ApiService {
     suspend fun login(@Body request: AuthenticationRequest): Response<AuthenticationResponse>
 
     @GET("/api/profile")
-    suspend fun getProfile(@Header("Authorization") token: String): Response<ProfileDataResponse>
+    suspend fun getProfile(): Response<ProfileDataResponse>
 
     @PUT("/api/profile")
     suspend fun updateProfile(
-        @Header("Authorization") token: String,
         @Body request: ProfileUpdateRequest
     ) : Response<ProfileDataResponse>
 }
