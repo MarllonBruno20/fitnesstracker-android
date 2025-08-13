@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,13 +35,23 @@ import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = viewModel(), onLoginSuccess: () -> Unit, onNavigateToRegister: () -> Unit) {
-    val state = viewModel.loginUiState.collectAsState().value
+fun LoginScreen(viewModel: LoginViewModel,
+                onNavigateToProfileSetup: () -> Unit,
+                onNavigateToHome: () -> Unit,
+                onNavigateToRegister: () -> Unit
+) {
+    val state by viewModel.loginUiState.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(state.isAuthenticated) {
-        if (state.isAuthenticated) {
-            onLoginSuccess()
+    LaunchedEffect(state.loginResult) {
+        state.loginResult?.let { result ->
+            if (result.success) {
+                if (result.isProfileComplete) {
+                    onNavigateToHome() // Perfil completo, vai para a Home
+                } else {
+                    onNavigateToProfileSetup() // Perfil incompleto, vai para o Setup
+                }
+            }
         }
     }
 

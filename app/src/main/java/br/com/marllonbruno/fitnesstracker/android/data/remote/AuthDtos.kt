@@ -15,5 +15,6 @@ data class AuthenticationRequest(
 
 // DTO para a resposta de autenticação
 data class AuthenticationResponse(
-    val token: String
+    val token: String,
+    val isProfileComplete: Boolean
 )

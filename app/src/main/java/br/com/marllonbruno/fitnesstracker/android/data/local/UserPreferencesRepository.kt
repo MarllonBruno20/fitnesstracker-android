@@ -30,6 +30,18 @@ class UserPreferencesRepository(private val context: Context) {
             preferences[jwtTokenKey]
         }
 
+    private val isProfileCompletedKey = booleanPreferencesKey("is_profile_complete")
+
+    suspend fun saveProfileStatus(isComplete: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[isProfileCompletedKey] = isComplete
+        }
+    }
+
+    val isProfileComplete: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[isProfileCompletedKey] ?: false
+    }
+
     private val hasSeenOnboardingKey = booleanPreferencesKey("has_seen_onboarding")
 
     suspend fun setOnboardingSeen() {

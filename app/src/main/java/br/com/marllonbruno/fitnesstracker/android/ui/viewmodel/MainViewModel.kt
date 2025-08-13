@@ -1,4 +1,5 @@
 package br.com.marllonbruno.fitnesstracker.android.ui.viewmodel
+import br.com.marllonbruno.fitnesstracker.android.BuildConfig
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -7,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import br.com.marllonbruno.fitnesstracker.android.data.local.UserPreferencesRepository
-import br.com.marllonbruno.fitnesstracker.android.data.remote.RetrofitClient
-import br.com.marllonbruno.fitnesstracker.android.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -21,10 +20,14 @@ class MainViewModel(private val prefsRepository: UserPreferencesRepository) : Vi
 
     init {
         viewModelScope.launch {
-            // Verifica no DataStore se o onboarding já foi visto
-            val hasSeenOnboarding = prefsRepository.hasSeenOnboarding.first()
-            // Define a rota inicial com base no resultado
-            _startDestination.value = if (hasSeenOnboarding) "login" else "onboarding"
+            // Se a build for de DEBUG, sempre mostre o onboarding para facilitar os testes.
+            if (BuildConfig.DEBUG) {
+                _startDestination.value = "onboarding"
+            } else {
+                // Se for uma build de RELEASE (produção), use a lógica normal.
+                val hasSeenOnboarding = prefsRepository.hasSeenOnboarding.first()
+                _startDestination.value = if (hasSeenOnboarding) "login" else "onboarding"
+            }
         }
     }
 

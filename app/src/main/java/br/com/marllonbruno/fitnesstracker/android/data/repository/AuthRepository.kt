@@ -12,20 +12,21 @@ class AuthRepository(
 ) {
 
     // Função para fazer o login
-    suspend fun login(request: AuthenticationRequest): Boolean {
+    suspend fun login(request: AuthenticationRequest): LoginResult {
         try {
             val response = apiService.login(request)
             if(response.isSuccessful && response.body() != null) {
+                val authResponse = response.body()!!
                 // Se o login foi bem-sucedido, salve o token no DataStore
-                val token = response.body()!!.token
-                preferencesRepository.saveJwtToken(token)
-                return true // Retorne true para indicar sucesso
+                preferencesRepository.saveJwtToken(authResponse.token)
+                preferencesRepository.saveProfileStatus(authResponse.isProfileComplete)
+                return LoginResult(success = true, isProfileComplete = authResponse.isProfileComplete)
             }
-            return false
+            return LoginResult(success = false, isProfileComplete = false)
         } catch (e: Exception) {
             // Em caso de erro de rede ou outro, retorna falha
             e.printStackTrace()
-            return false
+            return LoginResult(success = false, isProfileComplete = false)
         }
     }
 
@@ -57,5 +58,6 @@ class AuthRepository(
             return false
         }
     }
-
 }
+
+data class LoginResult(val success: Boolean, val isProfileComplete: Boolean)

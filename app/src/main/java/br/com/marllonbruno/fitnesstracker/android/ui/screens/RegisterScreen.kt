@@ -35,7 +35,9 @@ import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RegisterViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel = viewModel(), onRegisterSuccess: () -> Unit, onNavigateToLogin: () -> Unit) {
+fun RegisterScreen(viewModel: RegisterViewModel = viewModel(),
+                   onRegisterSuccess: () -> Unit,
+                   onNavigateToLogin: () -> Unit) {
     val state = viewModel.registerUiState.collectAsState().value
     val context = LocalContext.current
 

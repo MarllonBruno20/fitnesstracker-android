@@ -10,6 +10,7 @@ import br.com.marllonbruno.fitnesstracker.android.data.local.UserPreferencesRepo
 import br.com.marllonbruno.fitnesstracker.android.data.remote.AuthenticationRequest
 import br.com.marllonbruno.fitnesstracker.android.data.remote.RetrofitClient
 import br.com.marllonbruno.fitnesstracker.android.data.repository.AuthRepository
+import br.com.marllonbruno.fitnesstracker.android.data.repository.LoginResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -35,10 +36,16 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
                 email = _loginUiState.value.email,
                 password = _loginUiState.value.password
             )
-            val success = authRepository.login(request)
-            _loginUiState.update { it.copy(isLoading = false, isAuthenticated = success) }
-            if (!success) {
-                _loginUiState.update { it.copy(errorMessage = "Falha ao fazer login. Verifique seu email e senha.") }
+            val result = authRepository.login(request)
+            if (result.success) {
+                _loginUiState.update { it.copy(isLoading = false, loginResult = result) }
+            } else {
+                _loginUiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Falha ao fazer login."
+                    )
+                }
             }
         }
     }
@@ -61,6 +68,6 @@ data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val isAuthenticated: Boolean = false,
+    val loginResult: LoginResult? = null,
     val errorMessage: String? = null
 )

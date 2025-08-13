@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +19,9 @@ import br.com.marllonbruno.fitnesstracker.android.ui.screens.RegisterScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.LoginViewModel
 import androidx.compose.ui.platform.LocalContext
 import br.com.marllonbruno.fitnesstracker.android.ui.screens.OnboardingScreen
+import br.com.marllonbruno.fitnesstracker.android.ui.screens.ProfileSetupScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.MainViewModel
+import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.ProfileSetupViewModel
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RegisterViewModel
 
 @Composable
@@ -58,10 +61,18 @@ fun AppNavigation() {
 
             LoginScreen(
                 viewModel = loginViewModel,
-                onLoginSuccess = {
-                    // Navegar para a tela principal aqui
-                    println("Login Sucesso! Navegar para a tela principal")
+                onNavigateToProfileSetup = {
+                    navController.navigate("profile_setup") {
+                        // Limpa a tela de login da pilha para que o usuário não possa voltar
+                        popUpTo("login") { inclusive = true }
+                    }
                 },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        // Limpa a tela de login da pilha para que o usuário não possa voltar
+                        popUpTo("login") { inclusive = true }
+                    }
+                                   },
                 onNavigateToRegister = { navController.navigate("register") }
             )
         }
@@ -78,6 +89,20 @@ fun AppNavigation() {
                 onNavigateToLogin = { navController.navigate("login") }
             )
         }
-        // Adicione outras rotas aqui no futuro
+        composable("profile_setup") {
+            val context = LocalContext.current
+            val profileSetupViewModel: ProfileSetupViewModel = viewModel(factory = ProfileSetupViewModel.Factory(context.applicationContext as Application))
+            val profileSetupState by profileSetupViewModel.uiState.collectAsState()
+
+            ProfileSetupScreen(
+                viewModel = profileSetupViewModel,
+                onProfileUpdateSuccess = { navController.navigate("home") }
+            )
+        }
+
+        composable("home") {
+            Text("Bem-vindo à Tela Principal!")
+        }
+
     }
 }

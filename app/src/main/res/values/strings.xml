@@ -30,4 +30,18 @@
     <string name="login_button_loading">Carregando…</string>
     <string name="login_button_done">Entrar</string>
     <string name="login_register">Não possui uma conta? Crie uma</string>
+
+    <string name="enum_gender_male">Masculino</string>
+    <string name="enum_gender_female">Feminino</string>
+
+    <string name="enum_activity_sedentary">Sedentário</string>
+    <string name="enum_activity_lightly_active">Levemente Ativo</string>
+    <string name="enum_activity_moderately_active">Moderadamente Ativo</string>
+    <string name="enum_activity_active">Ativo</string>
+    <string name="enum_activity_very_active">Muito Ativo</string>
+
+    <string name="enum_objective_lose_weight">Perder Peso</string>
+    <string name="enum_objective_maintain_weight">Manter o Peso</string>
+    <string name="enum_objective_gain_muscle">Ganhar Músculo</string>
+
 </resources>
