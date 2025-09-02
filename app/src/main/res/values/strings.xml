@@ -44,4 +44,20 @@
     <string name="enum_objective_maintain_weight">Manter o Peso</string>
     <string name="enum_objective_gain_muscle">Ganhar Músculo</string>
 
+    <string name="enum_recipe_unit_grams">g</string>
+    <string name="enum_recipe_unit_kilograms">kg</string>
+    <string name="enum_recipe_unit_mililiters">ml</string>
+    <string name="enum_recipe_unit_liters">l</string>
+    <string name="enum_recipe_unit_teaspoon">colher de chá</string>
+    <string name="enum_recipe_unit_tablespoon">colher de sopa</string>
+    <string name="enum_recipe_unit_cup">xícara</string>
+    <string name="enum_recipe_unit_unit">unidade</string>
+    <string name="enum_recipe_unit_pinch">pitada</string>
+
+    <string name="enum_meal_type_breakfast">Café da manhã</string>
+    <string name="enum_meal_type_lunch">Almoço</string>
+    <string name="enum_meal_type_dinner">Janta</string>
+    <string name="enum_meal_type_snack">Lanche</string>
+
+
 </resources>

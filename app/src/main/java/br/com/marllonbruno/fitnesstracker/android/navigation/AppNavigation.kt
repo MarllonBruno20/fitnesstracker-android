@@ -18,10 +18,16 @@ import br.com.marllonbruno.fitnesstracker.android.ui.screens.LoginScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.screens.RegisterScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.LoginViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import br.com.marllonbruno.fitnesstracker.android.ui.screens.OnboardingScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.screens.ProfileSetupScreen
+import br.com.marllonbruno.fitnesstracker.android.ui.screens.RecipeDetailsScreen
+import br.com.marllonbruno.fitnesstracker.android.ui.screens.RecipeListScreen
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.MainViewModel
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.ProfileSetupViewModel
+import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RecipeDetailViewModel
+import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RecipeListViewModel
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RegisterViewModel
 
 @Composable
@@ -30,7 +36,7 @@ fun AppNavigation() {
 
     val context = LocalContext.current
     val mainViewModel: MainViewModel = viewModel(
-        factory = MainViewModel.Factory(context.applicationContext as Application)
+        factory = MainViewModel.Factory
     )
     val startDestination by mainViewModel.startDestination.collectAsState()
 
@@ -56,7 +62,7 @@ fun AppNavigation() {
 
         composable("login") {
             val context = LocalContext.current
-            val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory(context.applicationContext as Application))
+            val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory())
             val loginState by loginViewModel.loginUiState.collectAsState()
 
             LoginScreen(
@@ -68,7 +74,7 @@ fun AppNavigation() {
                     }
                 },
                 onNavigateToHome = {
-                    navController.navigate("home") {
+                    navController.navigate("recipe_list") {
                         // Limpa a tela de login da pilha para que o usuário não possa voltar
                         popUpTo("login") { inclusive = true }
                     }
@@ -78,7 +84,7 @@ fun AppNavigation() {
         }
         composable("register") {
             val context = LocalContext.current
-            val registerViewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory(context.applicationContext as Application))
+            val registerViewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory)
             val registerState by registerViewModel.registerUiState.collectAsState()
 
             RegisterScreen(
@@ -91,17 +97,41 @@ fun AppNavigation() {
         }
         composable("profile_setup") {
             val context = LocalContext.current
-            val profileSetupViewModel: ProfileSetupViewModel = viewModel(factory = ProfileSetupViewModel.Factory(context.applicationContext as Application))
+            val profileSetupViewModel: ProfileSetupViewModel = viewModel(factory = ProfileSetupViewModel.Factory())
             val profileSetupState by profileSetupViewModel.uiState.collectAsState()
 
             ProfileSetupScreen(
                 viewModel = profileSetupViewModel,
-                onProfileUpdateSuccess = { navController.navigate("home") }
+                onProfileUpdateSuccess = { navController.navigate("recipe_list") }
             )
         }
 
         composable("home") {
             Text("Bem-vindo à Tela Principal!")
+        }
+
+        composable ("recipe_list") {
+
+            val context = LocalContext.current
+            val recipeListViewModel: RecipeListViewModel = viewModel(factory = RecipeListViewModel.Factory)
+            val recipeListState by recipeListViewModel.uiState.collectAsState()
+
+            RecipeListScreen(
+                viewModel = recipeListViewModel,
+                onRecipeClick = { recipeId ->
+                    navController.navigate("recipe_detail/$recipeId")
+                },
+                onCreateClick = { navController.navigate("recipe_detail") }
+            )
+        }
+
+        composable(route = "recipe_detail/{recipeId}", // Rota com argumento
+            arguments = listOf(navArgument("recipeId") { type = NavType.LongType })) {
+            val recipeDetailViewModel: RecipeDetailViewModel = viewModel(factory = RecipeDetailViewModel.Factory) // Use sua factory aqui
+            RecipeDetailsScreen(
+                viewModel = recipeDetailViewModel,
+                onBackPress = { navController.popBackStack() }
+            )
         }
 
     }
