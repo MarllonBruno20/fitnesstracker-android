@@ -1,11 +1,13 @@
 package br.com.marllonbruno.fitnesstracker.android.ui.viewmodel
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import br.com.marllonbruno.fitnesstracker.android.MyApplication
+import br.com.marllonbruno.fitnesstracker.android.data.remote.IngredientDetailsResponse
 import br.com.marllonbruno.fitnesstracker.android.data.remote.IngredientRequest
 import br.com.marllonbruno.fitnesstracker.android.data.remote.RecipeCreateRequest
 import br.com.marllonbruno.fitnesstracker.android.data.repository.RecipeRepository
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 class RecipeCreateViewModel(private val recipeRepository: RecipeRepository) : ViewModel() {
 
@@ -58,8 +61,57 @@ class RecipeCreateViewModel(private val recipeRepository: RecipeRepository) : Vi
                 val newIngredients = _uiState.value.ingredients.toMutableList().also { it.removeAt(event.index) }
                 _uiState.update { it.copy(ingredients = newIngredients) }
             }
-            RecipeCreateEvent.SaveRecipe -> saveRecipe()
+
+            // Quando um ingrediente é selecionado na tela de busca
+            is RecipeCreateEvent.IngredientSelected -> {
+                _uiState.update { it.copy(ingredientForQuantityPrompt = event.ingredient) }
+            }
+
+            // Quando o usuário digita no campo de quantidade do diálogo
+            is RecipeCreateEvent.QuantityChanged -> {
+                _uiState.update { it.copy(quantityInput = event.quantity) }
+            }
+
+            // Quando o usuário cancela ou fecha o diálogo
+            is RecipeCreateEvent.DismissAddIngredientDialog -> {
+                _uiState.update { it.copy(ingredientForQuantityPrompt = null, quantityInput = "") }
+            }
+
+            // Quando o usuário confirma a adição do ingrediente no diálogo
+            is RecipeCreateEvent.AddIngredientConfirmed -> {
+                addIngredientToList()
+            }
+
+            RecipeCreateEvent.SaveRecipe -> submitData()
         }
+    }
+
+    private fun addIngredientToList(){
+
+        val ingredientToAdd = _uiState.value.ingredientForQuantityPrompt
+        val quantity = _uiState.value.quantityInput
+        val quantityAsDouble = quantity.toDoubleOrNull()
+
+        if(ingredientToAdd != null && quantityAsDouble != null && quantityAsDouble > 0){
+            val newIngredientInForm = IngredientInForm(
+                ingredientId = ingredientToAdd.id,
+                ingredientName = ingredientToAdd.name,
+                quantityInGrams = quantity,
+                measurementUnit = RecipeIngredientMeasurementUnit.GRAMS
+            )
+
+            val newIngredients = _uiState.value.ingredients + newIngredientInForm
+
+            _uiState.update { it.copy(
+                ingredients = newIngredients,
+                ingredientForQuantityPrompt = null,
+                quantityInput = ""
+            ) }
+        } else {
+            // Se a quantidade for inválida, apenas fecha o diálogo (ou pode-se adicionar um erro)
+            _uiState.update { it.copy(ingredientForQuantityPrompt = null, quantityInput = "") }
+        }
+
     }
 
     private fun validateInputs(): Boolean {
@@ -105,7 +157,7 @@ class RecipeCreateViewModel(private val recipeRepository: RecipeRepository) : Vi
         return true
     }
 
-    private fun saveRecipe() {
+    private fun submitData() {
 
         if(!validateInputs()) {
             return
@@ -167,17 +219,21 @@ data class RecipeCreateUiState(
 
     val mealTypes: Set<MealType> = emptySet(),
 
+    val ingredientForQuantityPrompt: IngredientDetailsResponse? = null, // Guarda o ingrediente selecionado
+    val quantityInput: String = "", // Guarda o texto digitado para a quantidade
+
     val isLoading: Boolean = false,
     val createdRecipeId: Long? = null, // Guarda o ID da receita criada para navegação
     val errorMessage: String? = null
 )
 
+@Parcelize
 data class IngredientInForm(
     val ingredientId: Long = 0,
     val ingredientName: String = "",
     val quantityInGrams: String = "",
     val measurementUnit: RecipeIngredientMeasurementUnit
-)
+) : Parcelable
 
 /**
  * Função de extensão que converte um objeto do formulário (UiState)

@@ -7,6 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("/api/auth/register")
@@ -31,4 +32,7 @@ interface ApiService {
 
     @POST("/api/recipes/new")
     suspend fun createRecipe(@Body request: RecipeCreateRequest): Response<RecipeDetailsResponse>
+
+    @GET("/api/ingredients")
+    suspend fun getIngredients(@Query("search") search: String? = null): Response<List<IngredientDetailsResponse>>
 }

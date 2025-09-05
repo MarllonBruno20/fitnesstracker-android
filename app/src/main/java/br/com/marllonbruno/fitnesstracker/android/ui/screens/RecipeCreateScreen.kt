@@ -1,34 +1,57 @@
 package br.com.marllonbruno.fitnesstracker.android.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import br.com.marllonbruno.fitnesstracker.android.model.MealType
 import br.com.marllonbruno.fitnesstracker.android.model.RecipeIngredientMeasurementUnit
 import br.com.marllonbruno.fitnesstracker.android.ui.theme.FitnessTrackerTheme
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.IngredientInForm
@@ -36,22 +59,61 @@ import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RecipeCreateEvent
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RecipeCreateUiState
 import br.com.marllonbruno.fitnesstracker.android.ui.viewmodel.RecipeCreateViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeCreateScreen(
     viewModel: RecipeCreateViewModel,
     onNavigateToSearchIngredient: () -> Unit,
     onRecipeCreated: (Long) -> Unit,
     onBackPress: () -> Unit
-){
-
+) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    // Efeito para navegar quando a receita for criada com sucesso
     LaunchedEffect(uiState.createdRecipeId) {
         uiState.createdRecipeId?.let { onRecipeCreated(it) }
     }
 
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Criar Nova Receita") },
+                navigationIcon = {
+                    IconButton(onClick = onBackPress) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            CreateRecipeScreenContent(
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+                onNavigateToSearchIngredient = onNavigateToSearchIngredient
+            )
+            // Mostra um indicador de progresso sobre a tela se estiver carregando
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+    }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateRecipeScreenContent(
     modifier: Modifier = Modifier,
@@ -59,6 +121,51 @@ fun CreateRecipeScreenContent(
     onEvent: (RecipeCreateEvent) -> Unit,
     onNavigateToSearchIngredient: () -> Unit,
 ) {
+
+    var showInstructionDialog by remember { mutableStateOf(false) }
+    var instructionText by remember { mutableStateOf("") }
+
+    if(showInstructionDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showInstructionDialog = false
+                instructionText = ""
+            },
+            title = { Text("Adicionar passo") },
+            text = {
+                OutlinedTextField(
+                    value = instructionText,
+                    onValueChange = { instructionText = it },
+                    label = { Text("Descrição do passo") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if(instructionText.isNotBlank()) {
+                            onEvent(RecipeCreateEvent.InstructionAdded(instructionText))
+                            showInstructionDialog = false
+                            instructionText = ""
+                        }
+                    }
+                ) {
+                    Text("Adicionar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showInstructionDialog = false
+                        instructionText = ""
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -121,10 +228,10 @@ fun CreateRecipeScreenContent(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "• ${ingredient.quantityInGrams} ${ingredient.measurementUnit.name} de ${ingredient.ingredientName}",
+                    text = "• ${ingredient.quantityInGrams} ${stringResource(id = ingredient.measurementUnit.displayNameRes)} de ${ingredient.ingredientName}",
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = { onEvent(RecipeCreateEvent.InstructionRemoved(index)) }) {
+                IconButton(onClick = { onEvent(RecipeCreateEvent.IngredientRemoved(index)) }) {
                     Icon(Icons.Default.Delete, contentDescription = "Remover ingrediente")
                 }
             }
@@ -138,20 +245,66 @@ fun CreateRecipeScreenContent(
             }
         }
 
+        // --- SEÇÃO DE INSTRUÇÕES ---
         item {
-            Text("Instruções", style = MaterialTheme.typography.titleLarge)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Instruções", style = MaterialTheme.typography.titleLarge)
+                // PASSO 2: O Botão que abre o diálogo
+                IconButton(onClick = { showInstructionDialog = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Adicionar Instrução")
+                }
+            }
         }
 
-        items(uiState.instructions.size) { index ->
-            val instruction = uiState.instructions[index]
-
+        // Lista das instruções já adicionadas
+        itemsIndexed(uiState.instructions) { index, instruction ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "• $instruction",
+                    text = "${index + 1}. $instruction",
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = { onEvent(RecipeCreateEvent.InstructionRemoved(index)) }) {
                     Icon(Icons.Default.Delete, contentDescription = "Remover instrução")
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text(
+                    text = "Tipos de Refeição (Selecione um ou mais)",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // FlowRow é um layout que quebra a linha automaticamente se os chips
+                // não couberem em uma única linha, ideal para diferentes tamanhos de tela.
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Itera sobre todos os valores possíveis do Enum MealType
+                    MealType.entries.forEach { mealType ->
+                        // O 'FilterChip' é perfeito para seleção múltipla
+                        FilterChip(
+                            selected = mealType in uiState.mealTypes, // Verifica se este chip está no set de selecionados
+                            onClick = { onEvent(RecipeCreateEvent.MealTypeToggled(mealType)) },
+                            label = { Text(stringResource(id = mealType.displayNameRes)) },
+                            leadingIcon = {
+                                // Mostra um ícone de "check" se o chip estiver selecionado
+                                if (mealType in uiState.mealTypes) {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = "Selecionado",
+                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                    )
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

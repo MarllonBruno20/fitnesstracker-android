@@ -5,8 +5,10 @@ import br.com.marllonbruno.fitnesstracker.android.data.local.UserPreferencesRepo
 import br.com.marllonbruno.fitnesstracker.android.data.remote.ApiService
 import br.com.marllonbruno.fitnesstracker.android.data.remote.RetrofitClient
 import br.com.marllonbruno.fitnesstracker.android.data.repository.AuthRepository
+import br.com.marllonbruno.fitnesstracker.android.data.repository.IngredientRepository
 import br.com.marllonbruno.fitnesstracker.android.data.repository.ProfileRepository
 import br.com.marllonbruno.fitnesstracker.android.data.repository.RecipeRepository
+import kotlin.getValue
 
 /**
  * Contêiner de dependências manual para o aplicativo.
@@ -18,6 +20,7 @@ interface AppContainer {
     val authRepository: AuthRepository
     val profileRepository: ProfileRepository
     val recipeRepository: RecipeRepository
+    val ingredientRepository: IngredientRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -40,6 +43,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val recipeRepository: RecipeRepository by lazy {
         RecipeRepository(apiService)
+    }
+
+    override val ingredientRepository: IngredientRepository by lazy {
+        IngredientRepository(apiService)
     }
 }
 
