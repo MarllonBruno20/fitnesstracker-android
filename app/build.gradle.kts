@@ -54,6 +54,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.runtime.livedata)
 
+    implementation(libs.logging.interceptor)
+
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.foundation)
 

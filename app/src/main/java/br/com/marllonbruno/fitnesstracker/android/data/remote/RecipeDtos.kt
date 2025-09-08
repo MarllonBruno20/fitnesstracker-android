@@ -45,12 +45,12 @@ data class RecipeCreateRequest (
     val prepTimeMinutes: Int,
     val servings: Int,
     val ingredients: List<IngredientRequest>,
-    val mealType: List<MealType>
+    val mealTypes: List<MealType>
 )
 
 data class IngredientRequest (
     val ingredientId: Long,
     val ingredientName: String,
     val quantityInGrams: Double,
-    val measurementUnit: RecipeIngredientMeasurementUnit
+    val displayUnit: RecipeIngredientMeasurementUnit
 )

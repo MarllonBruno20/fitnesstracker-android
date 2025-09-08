@@ -177,7 +177,7 @@ class RecipeCreateViewModel(private val recipeRepository: RecipeRepository) : Vi
                     prepTimeMinutes = state.prepTimeMinutes.toIntOrNull() ?: 0,
                     servings = state.servings.toIntOrNull() ?: 0,
                     ingredients = state.ingredients.map { it.toIngredientRequest() },
-                    mealType = state.mealTypes.toList()
+                    mealTypes = state.mealTypes.toList()
                 )
 
                 val newRecipe = recipeRepository.createRecipe(requestDto)
@@ -244,6 +244,6 @@ fun IngredientInForm.toIngredientRequest(): IngredientRequest {
         ingredientId = this.ingredientId,
         ingredientName = this.ingredientName,
         quantityInGrams = this.quantityInGrams.toDoubleOrNull() ?: 0.0, // Converte a String para Double
-        measurementUnit = this.measurementUnit
+        displayUnit = this.measurementUnit
     )
 }
