@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import br.com.marllonbruno.fitnesstracker.android.MyApplication
 import br.com.marllonbruno.fitnesstracker.android.data.local.UserPreferencesRepository
 import br.com.marllonbruno.fitnesstracker.android.data.remote.ProfileDataResponse
 import br.com.marllonbruno.fitnesstracker.android.data.remote.ProfileUpdateRequest
@@ -110,11 +111,12 @@ class ProfileSetupViewModel(private val profileRepository: ProfileRepository) : 
     }
 
     companion object {
-        fun Factory(application: Application): ViewModelProvider.Factory = viewModelFactory {
+        fun Factory(): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val apiService = RetrofitClient.create(context = application)
-                val prefsRepository = UserPreferencesRepository(application)
-                val profileRepository = ProfileRepository(apiService, prefsRepository)
+
+                val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MyApplication
+                val profileRepository = application.container.profileRepository
+
                 ProfileSetupViewModel(profileRepository)
             }
         }

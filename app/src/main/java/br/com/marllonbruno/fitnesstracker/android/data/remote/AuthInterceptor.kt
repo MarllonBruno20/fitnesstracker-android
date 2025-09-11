@@ -11,6 +11,13 @@ class AuthInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+
+        val originalRequest = chain.request()
+
+        if (originalRequest.url.encodedPath.contains("/api/auth/login")) {
+            return chain.proceed(originalRequest)
+        }
+
         // 1. Usamos runBlocking para obter o valor do Flow de forma síncrona
         val token = runBlocking {
             preferencesRepository.jwtToken.first()

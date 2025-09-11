@@ -1,4 +1,4 @@
-package br.com.marllonbruno.fitnesstracker.android.ui
+package br.com.marllonbruno.fitnesstracker.android.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

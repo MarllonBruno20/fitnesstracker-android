@@ -6,6 +6,8 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("/api/auth/register")
@@ -21,4 +23,16 @@ interface ApiService {
     suspend fun updateProfile(
         @Body request: ProfileUpdateRequest
     ) : Response<ProfileDataResponse>
+
+    @GET("/api/recipes/list-all")
+    suspend fun getRecipes(): Response<List<RecipeSummaryResponse>>
+
+    @GET("/api/recipes/details/{id}")
+    suspend fun getRecipeDetails(@Path("id") recipeId: Long): Response<RecipeDetailsResponse>
+
+    @POST("/api/recipes/new")
+    suspend fun createRecipe(@Body request: RecipeCreateRequest): Response<RecipeDetailsResponse>
+
+    @GET("/api/ingredients")
+    suspend fun getIngredients(@Query("search") search: String? = null): Response<List<IngredientDetailsResponse>>
 }
